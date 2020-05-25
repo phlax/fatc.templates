@@ -1,0 +1,25 @@
+# https://travis-ci.org/#!/phlax/fatc
+
+dist: bionic
+language: python
+env:
+  global:
+    - PYTHONUNBUFFERED=1
+
+install:
+  - make deb
+  - make pysh
+  - pip install pyyaml
+
+script:
+  - ls dist
+  - export COMPOSE_FILE=./example/docker-compose.yml
+  - docker-compose up -d
+  - docker-compose logs
+
+  - pysh ./tests/templates
+
+  - docker-compose down
+
+  - shellcheck -x usr/lib/tpls/*
+  - shellcheck -x usr/bin/*
