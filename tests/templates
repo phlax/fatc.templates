@@ -1,0 +1,23 @@
+#!/bin/bash -v
+
+if [ ! -z "$TRAP_ERRORS" ]; then
+    trap "$TRAP_ERRORS" ERR
+fi
+
+TPLS_EXEC="docker-compose exec -T tpls"
+
+docker-compose ps
+$TPLS_EXEC tpls list
+$TPLS_EXEC tpls pull nginx-example
+$TPLS_EXEC tpls list
+$TPLS_EXEC tpls render /tmp/rendered_tpls
+
+$TPLS_EXEC ls -l /tmp/rendered_tpls | grep nginx1
+$TPLS_EXEC ls -l /tmp/rendered_tpls | grep nginx2
+$TPLS_EXEC ls -l /tmp/rendered_tpls | grep nginx3 && exit 1 || echo ''
+
+export TPLS_TEST_NAME=nginx1
+$TPLS_EXEC cat /tmp/rendered_tpls/nginx1/docker-compose.yml | ./tests/yamltest.py
+
+export TPLS_TEST_NAME=nginx2
+$TPLS_EXEC cat /tmp/rendered_tpls/nginx2/docker-compose.yml | ./tests/yamltest.py
