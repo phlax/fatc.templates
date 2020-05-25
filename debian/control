@@ -1,0 +1,15 @@
+Source: tpls
+Section: devel
+Priority: optional
+Maintainer: "Ryan Northey" <ryan@synca.io>
+Build-Depends: debhelper (>=11~)
+Standards-Version: 4.1.4
+Homepage: https://github.com/phlax/tpls
+
+Package: tpls
+Section: devel
+Priority: optional
+Architecture: all
+Depends: ca-certificates, gettext-base, git, jq
+Description: Template mangler
+ Pull templates from template registries and apply configurable substitutions
