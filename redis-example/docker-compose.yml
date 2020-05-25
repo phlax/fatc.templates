@@ -1,0 +1,21 @@
+version: $FATC_COMPOSE_VERSION
+
+services:
+  $FATC_SERVICE:
+    image: $FATC_IMAGE
+    restart: $FATC_RESTART
+    networks:
+      $FATC_NETWORK:
+        ipv4_address: $FATC_IP
+    expose:
+      - "80"
+      - "443"
+    volumes:
+      - $FATC_CONFIG:/etc/nginx/conf.d
+      - $FATC_ASSETS:$FATC_ASSETS_MOUNT
+    labels:
+      custom_label: $FATC_LABEL
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: $FATC_HEALTHCHECK_COMMAND
