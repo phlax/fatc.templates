@@ -1,0 +1,1 @@
+# fatc.templates
