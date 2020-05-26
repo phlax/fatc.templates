@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+. /usr/lib/tpls/functions
+
+
+case "$1" in
+    list )
+	tpls_templates_list
+	;;
+    render )
+	tpls_render_templates "$2"
+	;;
+    pull )
+	tpls_templates_pull_template "$2"
+	;;
+esac

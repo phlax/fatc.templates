@@ -1,0 +1,150 @@
+#!/bin/bash -e
+
+TPLS_TEMPLATES_DIR=/var/lib/fatc/templates
+TPLS_TEMPLATES_REGISTRY=https://github.com/phlax/fatc.templates
+TPLS_CONFIG=/etc/tpls/config.json
+TPLS_RENDER='.render | to_entries[] | @base64'
+
+
+tpls_log () {
+    echo "${*}"
+}
+
+
+tpls_log_warn () {
+    echo "WARNING: ${*}" >&2
+}
+
+
+tpls_log_error () {
+    echo "ERROR: ${*}" >&2
+}
+
+
+tpls_fetch_subdir_from_git () {
+    local cwd directory repository tempdir
+    repository="$1"
+    directory="$2"
+    cwd=$(pwd)
+    tempdir=$(mktemp -d)
+
+    tpls_log "PULL $directory FROM $repository"
+    cd "$tempdir"
+    git init -q tmptarget
+    cd tmptarget
+    git remote add origin "$repository"
+    git config core.sparsecheckout true
+    echo "${directory}/*"> .git/info/sparse-checkout
+    git pull -q --depth=1 origin master
+    cd "$cwd"
+    cp -a "${tempdir}/tmptarget/${directory}" .
+    rm -rf "$tempdir"
+}
+
+
+tpls_templates_list () {
+    if [ ! -d "$TPLS_TEMPLATES_DIR" ]; then
+	return
+    fi
+    ls "$TPLS_TEMPLATES_DIR"
+}
+
+
+tpls_templates_pull_template () {
+    local cwd target tempdir
+    cwd=$(pwd)
+    tempdir=$(mktemp -d)
+    target="$1"
+    cd "$tempdir"
+    tpls_fetch_subdir_from_git "$TPLS_TEMPLATES_REGISTRY" "$target"
+
+    if [ ! -d "$TPLS_TEMPLATES_DIR" ]; then
+	mkdir -p "$TPLS_TEMPLATES_DIR"
+    fi
+
+    if [ -d "${TPLS_TEMPLATES_DIR}/${target}" ]; then
+	rm -rf "${TPLS_TEMPLATES_DIR:?}/${target}"
+    fi
+    cp -a "$target" "$TPLS_TEMPLATES_DIR"
+    cd "$cwd"
+    rm -rf "$tempdir"
+}
+
+
+tpls_mangle_templateset () {
+    local cwd config default file key name required tpls value var vars tmpdir
+    cwd=$(pwd)
+    tmpdir=$(mktemp -d)
+    cd "$tmpdir"
+    config=$(echo "$1" | base64 --decode)
+    name=$(echo "$config" | jq -r '.key')
+    tpls=$(echo "$config" | jq -r '.value.tpls')
+    vars=$(echo "$config" | jq -r '.value.vars // empty')
+    if ! tpls_templates_list | grep "$tpls" > /dev/null; then
+	tpls_templates_pull_template "$tpls"
+    fi
+    cp -a "${TPLS_TEMPLATES_DIR:?}/${tpls}" "$name"
+    cd "$name"
+    if [ -f ./tpls.json ]; then
+	for required in $(jq -r '. // {} | .required // [] | .[]' ./tpls.json); do
+	    var=$(echo "$vars" | jq -r --arg required "$required" '.[$required] // empty')
+	    if [ -z "$var" ]; then
+		tpls_log_warn "Not rendering templates ($name), missing required var: $required"
+		return
+	    fi
+	done
+	for default in $(jq -r '. // {} | .defaults // {} | keys[]' ./tpls.json); do
+	    value=$(jq -r --arg default "$default" '.defaults[$default]' ./tpls.json)
+	    key=$(echo "${default^^}" | tr '.' '_')
+	    key="FATC_$key"
+	    printf -v "$key" "%s" "$value"
+	    export "${key?}"
+	done
+    fi
+    if [ -n "$vars" ]; then
+	for key in $(echo "$vars" | jq -r 'keys[]'); do
+	    value=$(echo "$vars" | jq -r --arg key "$key" '.[$key]')
+	    key=$(echo "${key^^}" | tr '.' '_')
+	    key="FATC_$key"
+	    printf -v "$key" "%s" "$value"
+	    export "${key?}"
+	done
+    fi
+    while IFS= read -r -d '' file; do
+	if [ "$file" = "./tpls.json" ]; then
+	    continue
+	fi
+	if [ "$file" = "." ]; then
+	    continue
+	fi
+	# shellcheck disable=SC2094
+	envsubst < "$file" | tee "$file" > /dev/null
+    done < <(find . -print0)
+    for key in $(env); do
+	key=$(echo "$key" | cut -d= -f1)
+	if [[ "$key" = FATC_* ]]; then
+	    unset "$key"
+	fi
+    done
+    cp -a "../${name}" "$cwd"
+    cd "$cwd"
+    rm -rf "$tmpdir"
+}
+
+
+tpls_render_templates () {
+    local cwd
+    if [ -z "$1" ]; then
+	tpls_log_error "You must specify a path to render the templates"
+	return
+    fi
+    cwd=$(pwd)
+    if [ ! -d "$1" ]; then
+	mkdir -p "$1"
+    fi
+    cd "$1"
+    for template in $(jq -cr "$TPLS_RENDER" "$TPLS_CONFIG"); do
+	tpls_mangle_templateset "$template"
+    done
+    cd "$cwd"
+}
