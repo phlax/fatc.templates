@@ -1,0 +1,25 @@
+version: "2.4"
+
+services:
+  waiter:
+    image: busybox
+    depends_on:
+      tpls:
+        condition: service_healthy
+  tpls:
+    image: debian:buster-slim
+    privileged: true
+    command: tail -f /dev/null
+    entrypoint:
+      - /entrypoint.sh
+    environment:
+      - TERM=linux
+      - DEBIAN_FRONTEND=noninteractive
+    volumes:
+      - ${PWD}/example/entrypoint.sh:/entrypoint.sh
+      - ${PWD}/dist:/tmp/dist
+      - ${PWD}/example/config.json:/etc/tpls/config.json
+    healthcheck:
+      interval: 10s
+      retries: 20
+      test: which tpls || exit 1
