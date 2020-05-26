@@ -1,21 +1,21 @@
-version: $FATC_COMPOSE_VERSION
+version: $TPL_COMPOSE_VERSION
 
 services:
-  $FATC_SERVICE:
-    image: $FATC_IMAGE
-    restart: $FATC_RESTART
+  $TPL_SERVICE:
+    image: $TPL_IMAGE
+    restart: $TPL_RESTART
     networks:
-      $FATC_NETWORK:
-        ipv4_address: $FATC_IP
+      $TPL_NETWORK:
+        ipv4_address: $TPL_IP
     expose:
       - "80"
       - "443"
     volumes:
-      - $FATC_CONFIG:/etc/nginx/conf.d
-      - $FATC_ASSETS:$FATC_ASSETS_MOUNT
+      - $TPL_CONFIG:/etc/nginx/conf.d
+      - $TPL_ASSETS:$TPL_ASSETS_MOUNT
     labels:
-      custom_label: $FATC_LABEL
+      custom_label: $TPL_LABEL
     healthcheck:
       interval: 10s
       retries: 20
-      test: $FATC_HEALTHCHECK_COMMAND
+      test: $TPL_HEALTHCHECK_COMMAND

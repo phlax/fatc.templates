@@ -72,7 +72,7 @@ tpls_templates_pull_template () {
 
 
 tpls_mangle_templateset () {
-    local cwd config default file key name required tpls value var vars tmpdir
+    local cwd config default file key name required subst tpls value var vars tmpdir
     cwd=$(pwd)
     tmpdir=$(mktemp -d)
     cd "$tmpdir"
@@ -96,18 +96,22 @@ tpls_mangle_templateset () {
 	for default in $(jq -r '. // {} | .defaults // {} | keys[]' ./tpls.json); do
 	    value=$(jq -r --arg default "$default" '.defaults[$default]' ./tpls.json)
 	    key=$(echo "${default^^}" | tr '.' '_')
-	    key="FATC_$key"
+	    key="TPL_$key"
 	    printf -v "$key" "%s" "$value"
 	    export "${key?}"
+	    subst+='$'
+	    subst+="$key "
 	done
     fi
     if [ -n "$vars" ]; then
 	for key in $(echo "$vars" | jq -r 'keys[]'); do
 	    value=$(echo "$vars" | jq -r --arg key "$key" '.[$key]')
 	    key=$(echo "${key^^}" | tr '.' '_')
-	    key="FATC_$key"
+	    key="TPL_$key"
 	    printf -v "$key" "%s" "$value"
 	    export "${key?}"
+	    subst+='$'
+	    subst+="$key "
 	done
     fi
     while IFS= read -r -d '' file; do
@@ -118,11 +122,11 @@ tpls_mangle_templateset () {
 	    continue
 	fi
 	# shellcheck disable=SC2094
-	envsubst < "$file" | tee "$file" > /dev/null
+	envsubst "$subst" < "$file" | tee "$file" > /dev/null
     done < <(find . -print0)
     for key in $(env); do
 	key=$(echo "$key" | cut -d= -f1)
-	if [[ "$key" = FATC_* ]]; then
+	if [[ "$key" = TPL_* ]]; then
 	    unset "$key"
 	fi
     done
