@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
-TPLS_TEMPLATES_DIR=/var/lib/fatc/templates
-TPLS_TEMPLATES_REGISTRY=https://github.com/phlax/fatc.templates
-TPLS_CONFIG=/etc/tpls/config.json
-TPLS_RENDER='.render | to_entries[] | @base64'
+TPLS_TEMPLATES_DIR=${TPLS_TEMPLATES_DIR:-/var/lib/fatc/templates}
+TPLS_TEMPLATES_REGISTRY=${TPLS_TEMPLATES_REGISTRY:-https://github.com/phlax/fatc.templates}
+TPLS_CONFIG=${TPLS_CONFIG:-/etc/tpls/config.json}
+TPLS_RENDER=${TPLS_RENDER:-'.render | to_entries[] | @base64'}
 
 
 tpls_log () {
@@ -42,6 +42,14 @@ tpls_fetch_subdir_from_git () {
 }
 
 
+tpls_fetch_subdir () {
+    local directory repository
+    repository="$1"
+    directory="$2"
+    cp -a "${repository}/${directory}" .
+}
+
+
 tpls_templates_list () {
     if [ ! -d "$TPLS_TEMPLATES_DIR" ]; then
 	return
@@ -56,7 +64,11 @@ tpls_templates_pull_template () {
     tempdir=$(mktemp -d)
     target="$1"
     cd "$tempdir"
-    tpls_fetch_subdir_from_git "$TPLS_TEMPLATES_REGISTRY" "$target"
+    if [[ "$TPLS_TEMPLATES_REGISTRY" = /* ]]; then
+	tpls_fetch_subdir "$TPLS_TEMPLATES_REGISTRY" "$target"
+    else
+	tpls_fetch_subdir_from_git "$TPLS_TEMPLATES_REGISTRY" "$target"
+    fi
 
     if [ ! -d "$TPLS_TEMPLATES_DIR" ]; then
 	mkdir -p "$TPLS_TEMPLATES_DIR"
