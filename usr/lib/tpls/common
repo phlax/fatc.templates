@@ -133,8 +133,13 @@ tpls_mangle_templateset () {
 	if [ "$file" = "." ]; then
 	    continue
 	fi
-	# shellcheck disable=SC2094
-	envsubst "$subst" < "$file" | tee "$file" > /dev/null
+	if [ -n "$TPLS_DEBUG" ]; then
+	    # shellcheck disable=SC2094
+	    envsubst "$subst" < "$file" | tee "$file"
+	else
+	    # shellcheck disable=SC2094
+	    envsubst "$subst" < "$file" | tee "$file" > /dev/null
+	fi
     done < <(find . -print0)
     for key in $(env); do
 	key=$(echo "$key" | cut -d= -f1)
