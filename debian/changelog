@@ -1,4 +1,10 @@
-tpls (0.0.2) UNRELEASED; urgency=medium
+tpls (0.0.3) UNRELEASED; urgency=medium
+
+  * Add debugging
+
+ -- Ryan Northey <ryan@synca.io>  Thu, 28 May 2020 04:03:16 +0100
+
+tpls (0.0.2) buster; urgency=medium
 
   * Make env vars configurable
   * Allow local filesystem registry
