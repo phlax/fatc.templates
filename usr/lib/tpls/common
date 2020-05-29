@@ -135,6 +135,11 @@ tpls_mangle_templateset () {
 	fi
 	envsubst "$subst" < "$file" | sponge "$file"
 	if [ -n "$TPLS_DEBUG" ]; then
+	    echo
+	    echo ">>>"
+	    echo ">>> TEMPLATE: $file"
+	    echo ">>>"
+	    echo
 	    cat "$file"
 	fi
     done < <(find . -print0)
