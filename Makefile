@@ -13,3 +13,9 @@ deb:
 pysh:
 	pip install -U pip setuptools termcolor
 	pip install -e 'git+https://github.com/phlax/pysh#egg=pysh.test&subdirectory=pysh.test'
+
+publish:
+	git checkout master
+	git fetch origin
+	git rebase origin/master
+	make deb
