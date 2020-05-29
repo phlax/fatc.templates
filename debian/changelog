@@ -1,4 +1,10 @@
-tpls (0.0.4) UNRELEASED; urgency=medium
+tpls (0.0.5) UNRELEASED; urgency=medium
+
+  * Improve debugging
+
+ -- Ryan Northey <ryan@synca.io>  Fri, 29 May 2020 12:27:10 +0100
+
+tpls (0.0.4) buster; urgency=medium
 
   * Replace tee with sponge
 
