@@ -16,7 +16,7 @@
 		"assets": "./nginx/assets1"
 	    }
 	},
-	"nginx2": {
+	"nginx2-a": {
 	    "tpls": "nginx-example",
 	    "vars": {
 		"label": "NGINX 2 LABEL",
