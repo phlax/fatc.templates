@@ -142,7 +142,7 @@ tpls_mangle_templateset () {
 	    echo
 	    cat "$file"
 	fi
-    done < <(find . -print0)
+    done < <(find . -type f -print0)
     for key in $(env); do
 	key=$(echo "$key" | cut -d= -f1)
 	if [[ "$key" = TPL_* ]]; then
