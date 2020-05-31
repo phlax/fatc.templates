@@ -9,6 +9,7 @@
 		"network": "nginx1_net",
 		"ip": "192.168.23.11",
 		"restart": "unless-stopped",
+		"secret": "asdnoiann;askdf$iapknnslkfs",
 		"assets.mount": "/var/www/nginx1/assets",
 		"label": "NGINX 1 LABEL",
 		"healthcheck.command": "service nginx status || echo 'No webs for you' && exit 1",
