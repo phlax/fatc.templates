@@ -4,6 +4,7 @@
 	"image": "nginx",
 	"service": "nginx",
 	"restart": "unless-stopped",
+	"secret": "",
 	"assets.mount": "/var/www/assets",
 	"healthcheck.command": "service nginx status || exit 1",
 	"compose.version": "2.3"
