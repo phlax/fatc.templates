@@ -16,6 +16,7 @@ script:
   - export COMPOSE_FILE=./example/docker-compose.yml
 
   - pysh ./tests/templates
+  - pysh ./tests/commit
 
   - shellcheck -x usr/lib/tpls/*
   - shellcheck -x usr/bin/*
