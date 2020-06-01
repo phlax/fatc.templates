@@ -14,12 +14,8 @@ install:
 script:
   - ls dist
   - export COMPOSE_FILE=./example/docker-compose.yml
-  - docker-compose up -d
-  - docker-compose logs
 
   - pysh ./tests/templates
-
-  - docker-compose down
 
   - shellcheck -x usr/lib/tpls/*
   - shellcheck -x usr/bin/*
