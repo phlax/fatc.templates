@@ -4,6 +4,9 @@
 
 
 case "$1" in
+    commit )
+	tpls_templates_commit
+	;;
     list )
 	tpls_templates_list
 	;;
@@ -12,5 +15,8 @@ case "$1" in
 	;;
     pull )
 	tpls_templates_pull_template "$2"
+	;;
+    verify )
+	tpls_verify "$2"
 	;;
 esac
