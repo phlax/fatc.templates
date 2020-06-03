@@ -182,7 +182,26 @@ tpls_render_templates () {
 
 
 tpls_commit () {
+    local dirhash metadata name path
     echo "COMMIT TPL..."
+    path=${1:-.}
+    if [ ! -d "$path" ]; then
+	tpls_log_error "You must supply a valid directory path"
+	exit 1
+    fi
+    name=$(basename "$path")
+    if [ ! -d "${path}/.tpls" ]; then
+	mkdir -p "${path}/.tpls"
+	tpls_log_warn "Templates (${name}) .tpls folder did not exist, created"
+    fi
+    dirhash=$(tpls_hash "${path}")
+    metadata="${path}/.tpls/metadata.json"
+    if [ ! -f "$metadata" ]; then
+	echo "{}" > "$metadata"
+    fi
+    jq --arg hash "${dirhash}" \
+       '.hash = $hash' "$metadata" \
+	| sponge "$metadata"
 }
 
 

@@ -5,7 +5,7 @@
 
 case "$1" in
     commit )
-	tpls_templates_commit
+	tpls_commit "$2"
 	;;
     list )
 	tpls_templates_list
