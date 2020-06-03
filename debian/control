@@ -10,6 +10,6 @@ Package: tpls
 Section: devel
 Priority: optional
 Architecture: all
-Depends: ca-certificates, gettext-base, git, hashtree, jq, moreutils
+Depends: bsdmainutils, ca-certificates, gettext-base, git, hashtree, jq, moreutils
 Description: Template mangler
  Pull templates from template registries and apply configurable substitutions
