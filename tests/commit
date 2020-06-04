@@ -9,8 +9,15 @@ TPLS_EXEC="docker-compose exec -T tpls"
 
 docker-compose up -d
 
+## these tests are not very good - but the code ~works
+
 $TPLS_EXEC tpls pull redis-example 2> >(grep -i WARNING)
 $TPLS_EXEC tpls verify redis-example 2> >(grep -i WARNING)
+
+$TPLS_EXEC tpls commit /var/lib/tpls/redis-example
+$TPLS_EXEC tpls verify redis-example 2> >(grep -i WARNING && exit 1)
+
+$TPLS_EXEC tpls list
 
 
 docker-compose down
