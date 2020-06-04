@@ -1,0 +1,18 @@
+#!/bin/bash -v
+
+if [ ! -z "$TRAP_ERRORS" ]; then
+    trap "$TRAP_ERRORS" ERR
+fi
+
+TPLS_EXEC="docker-compose exec -T tpls"
+
+
+docker-compose up -d
+
+
+$TPLS_EXEC tpls pull
+$TPLS_EXEC tpls list | grep nginx-example
+$TPLS_EXEC tpls list | grep redis-example
+
+
+docker-compose down

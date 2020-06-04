@@ -17,6 +17,7 @@ script:
 
   - pysh ./tests/templates
   - pysh ./tests/commit
+  - pysh ./tests/pull
 
   - shellcheck -x usr/lib/tpls/*
   - shellcheck -x usr/bin/*
