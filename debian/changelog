@@ -1,4 +1,11 @@
-tpls (0.0.7) UNRELEASED; urgency=medium
+tpls (0.0.8) UNRELEASED; urgency=medium
+
+  * Add template commits
+  * Pull all templates if no templateset specified
+
+ -- Ryan Northey <ryan@synca.io>  Thu, 04 Jun 2020 09:57:13 +0100
+
+tpls (0.0.7) buster; urgency=medium
 
   * Add hashing and basic verification of template directories
 
