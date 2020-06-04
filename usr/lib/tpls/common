@@ -91,6 +91,22 @@ tpls_templates_pull_template () {
 }
 
 
+tpls_pull () {
+    local template templates tpls
+    if [ -n "$1" ]; then
+	tpls_templates_pull_template "${@}"
+    else
+	for template in $(jq -cr "$TPLS_RENDER" "$TPLS_CONFIG"); do
+	    tpls+=("$(echo "$template" | base64 --decode | jq -r '.value.tpls')")
+	done
+	templates=$(echo "${tpls[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+	for template in $templates; do
+	    tpls_templates_pull_template "$template"
+	done
+    fi
+}
+
+
 tpls_mangle_templateset () {
     local cwd config default file key name required subst tpls value var vars tmpdir
     cwd=$(pwd)

@@ -14,7 +14,7 @@ case "$1" in
 	tpls_render_templates "$2"
 	;;
     pull )
-	tpls_templates_pull_template "$2"
+	tpls_pull "$2"
 	;;
     verify )
 	tpls_verify "$2"
